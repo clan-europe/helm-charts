@@ -94,7 +94,9 @@ spec:
   {{- $p := .Values.persistence | default dict }}
   {{- if $p.enabled }}
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: data
       spec:
         accessModes:
