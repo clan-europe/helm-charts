@@ -1,2 +1,13 @@
 apiVersion: v1
-entries: []
+entries:
+  common:
+    - apiVersion: v2
+      created: "2026-08-05T08:44:30.170711651Z"
+      description: Shared Helm library for Yugen bot charts
+      digest: 05b18013403f76b5cd2cf1ebca1a9d8928f4c3f2a24df75174e76c5cb9f827e5
+      name: common
+      type: library
+      urls:
+        - https://github.com/clan-europe/helm-charts/releases/download/common-0.1.0/common-0.1.0.tgz
+      version: 0.1.0
+generated: "2026-08-05T08:44:31.212980759Z"
