@@ -1,6 +1,6 @@
 apiVersion: v2
-name: discord
-description: Umbrella chart deploying the full Clan Europe Discord stack (bot + event + pocketbase)
+name: go-bots
+description: Umbrella chart deploying the full Clan Europe Golang Discord stack (bot + event + pocketbase)
 type: application
 version: 0.1.0
 appVersion: "main"
