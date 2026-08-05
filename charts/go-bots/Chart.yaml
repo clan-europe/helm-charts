@@ -2,18 +2,18 @@ apiVersion: v2
 name: go-bots
 description: Umbrella chart deploying the full Clan Europe Golang Discord stack (bot + event + pocketbase)
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "main"
 dependencies:
   - name: bot
-    version: "0.1.0"
+    version: "0.1.1"
     repository: "file://../bot"
     condition: bot.enabled
   - name: event
-    version: "0.1.0"
+    version: "0.1.1"
     repository: "file://../event"
     condition: event.enabled
   - name: pocketbase
-    version: "0.1.0"
+    version: "0.1.1"
     repository: "file://../pocketbase"
     condition: pocketbase.enabled
