@@ -1,0 +1,79 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/clan-europe/bot
+  # tag defaults to .Chart.AppVersion ("main") when empty
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 3000
+
+probes:
+  path: /api/
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: bot.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+extraEnv: []
+
+# Non-sensitive configuration — mounted as a ConfigMap.
+# All values must be strings (Helm quotes them).
+config:
+  ENV: "production"
+  LOG_LEVEL: "info"
+  # Set "true" to sync slash commands on startup (do once, then set "false")
+  SYNC_COMMANDS: "false"
+  DISCORD_APP_ID: ""
+  DISCORD_DEVELOPMENT_GUILD_ID: ""
+  # Channel ID for log report messages
+  DISCORD_LOGS_REPORT_CHANNEL_ID: ""
+  # Comma-separated list of Discord user IDs with owner privileges
+  OWNER_IDS: ""
+  POCKETBASE_URL: ""
+  POCKETBASE_EMAIL: ""
+  R2_ACCOUNT_ID: ""
+  R2_FILES_BUCKET: ""
+  # CDN base URL used when generating apply/image links (bot-only)
+  CDN_URL: ""
+  API_LISTEN_HOST: "0.0.0.0"
+  API_LISTEN_PORT: "3000"
+
+# Sensitive values — mounted as a Kubernetes Secret.
+# Use existingSecret to reference a pre-created Secret (e.g. sealed-secrets) instead.
+secrets:
+  # Name of a pre-existing Secret to use in place of the chart-managed one.
+  # When set, the chart will NOT create a Secret object; all keys below are ignored.
+  existingSecret: ""
+  DISCORD_TOKEN: ""
+  POCKETBASE_PASSWORD: ""
+  R2_ACCESS_KEY_ID: ""
+  R2_ACCESS_KEY_SECRET: ""

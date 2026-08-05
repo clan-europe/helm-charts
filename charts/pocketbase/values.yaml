@@ -1,0 +1,66 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/clan-europe/pocketbase
+  # tag defaults to .Chart.AppVersion ("main") when empty
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 8090
+
+probes:
+  path: /api/health
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: pocketbase.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+extraEnv: []
+
+# PocketBase reads no application env vars — config is CLI-driven.
+# The chart renders no ConfigMap or Secret unless existingSecret is set.
+config: {}
+
+secrets:
+  # Set to the name of a pre-existing Secret to mount it via envFrom.
+  # Useful when you need to inject env vars (e.g. via sealed-secrets) even though
+  # PocketBase itself reads no env vars by default.
+  existingSecret: ""
+
+# Persistent storage for /opt/app/pb_data (SQLite DB + file uploads).
+# PocketBase is a stateful app; this is backed by a StatefulSet + volumeClaimTemplate.
+persistence:
+  enabled: true
+  mountPath: /opt/app/pb_data
+  size: 8Gi
+  # storageClassName: "" uses the cluster default StorageClass.
+  # Set explicitly if you need a specific provisioner (e.g. "local-path", "longhorn").
+  storageClassName: ""

@@ -1,0 +1,71 @@
+# Umbrella chart — enable/disable each component independently.
+#
+# To use a pre-existing Secret instead of chart-managed secrets, set
+# <component>.secrets.existingSecret to the Secret name. The chart will then
+# mount that Secret via envFrom and skip creating its own Secret object.
+# The external Secret must contain the same keys listed under secrets below.
+
+bot:
+  enabled: true
+  secrets:
+    # Name of a pre-existing Secret to use instead of a chart-managed one.
+    # When set, all other secrets.* keys below are ignored.
+    existingSecret: ""
+    DISCORD_TOKEN: ""
+    POCKETBASE_PASSWORD: ""
+    R2_ACCESS_KEY_ID: ""
+    R2_ACCESS_KEY_SECRET: ""
+
+event:
+  enabled: true
+  secrets:
+    # Name of a pre-existing Secret to use instead of a chart-managed one.
+    # When set, all other secrets.* keys below are ignored.
+    existingSecret: ""
+    DISCORD_TOKEN: ""
+    POCKETBASE_PASSWORD: ""
+    R2_ACCESS_KEY_ID: ""
+    R2_ACCESS_KEY_SECRET: ""
+
+pocketbase:
+  enabled: true
+  secrets:
+    # Name of a pre-existing Secret to use instead of a chart-managed one.
+    # Only needed when you want to inject env vars into PocketBase at runtime.
+    existingSecret: ""
+
+# -----------------------------------------------------------------------------
+# Per-component config overrides.
+# Merged into each sub-chart's values. Only set what differs from defaults.
+# -----------------------------------------------------------------------------
+
+# bot:
+#   config:
+#     POCKETBASE_URL: "http://<release>-pocketbase"
+#     POCKETBASE_EMAIL: "admin@claneurope.cc"
+#     DISCORD_LOGS_REPORT_CHANNEL_ID: "123456789"
+#     OWNER_IDS: "111111111,222222222"
+#     R2_ACCOUNT_ID: "abc123"
+#     R2_FILES_BUCKET: "clan-europe-files"
+#     CDN_URL: "https://cdn.claneurope.cc"
+
+# event:
+#   config:
+#     POCKETBASE_URL: "http://<release>-pocketbase"
+#     POCKETBASE_EMAIL: "admin@claneurope.cc"
+#     DISCORD_LOGS_REPORT_CHANNEL_ID: "123456789"
+#     OWNER_IDS: "111111111,222222222"
+#     R2_ACCOUNT_ID: "abc123"
+#     R2_FILES_BUCKET: "clan-europe-files"
+
+# pocketbase:
+#   persistence:
+#     size: 16Gi
+#   ingress:
+#     enabled: true
+#     className: nginx
+#     hosts:
+#       - host: pb.claneurope.cc
+#         paths:
+#           - path: /
+#             pathType: Prefix
