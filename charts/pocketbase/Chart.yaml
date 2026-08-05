@@ -2,9 +2,9 @@ apiVersion: v2
 name: pocketbase
 description: Helm chart for the Clan Europe PocketBase backend
 type: application
-version: 0.1.4
-appVersion: "main"
+version: 0.1.5
+appVersion: "latest"
 dependencies:
   - name: common
-    version: "0.1.4"
+    version: "0.1.5"
     repository: "file://../common"
