@@ -1,0 +1,21 @@
+CVC Discord Bot deployed.
+
+This is a portless worker — it connects outbound to the Discord gateway.
+There is no HTTP service; do not attempt to port-forward or set up Ingress.
+
+Monitor via pod logs:
+
+  kubectl logs -l app.kubernetes.io/name=cvc -n {{ .Release.Namespace }} -f
+
+Ensure the following are populated before the bot can start:
+
+  secrets.TOKEN          — Discord bot token (required)
+  secrets.SUPABASE_KEY   — Supabase service key (required)
+
+  credentials.serviceAccountJson — Google service account JSON
+  credentials.configJson          — data/config.json (spreadsheet key, channel IDs)
+
+  Alternatively, provide pre-existing Secrets:
+    secrets.existingSecret     — name of Secret with TOKEN + SUPABASE_KEY
+    credentials.secretName     — name of Secret with service_account.json + config.json
+                                  (chart will not create it when credentials fields are empty)

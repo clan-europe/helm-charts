@@ -1,0 +1,102 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/clan-europe/cvc-bot
+  # tag defaults to .Chart.AppVersion ("latest") when empty
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+# No service/ports — this bot has no HTTP server; it connects outbound to Discord's gateway.
+# No probes — no HTTP endpoint to probe against.
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+extraEnv: []
+
+# Non-sensitive configuration — mounted as a ConfigMap.
+# All values must be strings (Helm quotes them). Empty values are skipped.
+config:
+  # Discord guild (server) ID the bot operates in.
+  GUILD_ID: "840902934392733727"
+  # Discord user ID with bot owner privileges (used for /owner commands).
+  OWNER_ID: "261816179595673601"
+  # Supabase project URL (public, non-secret).
+  SUPABASE_URL: "https://scjaxtezzzbdrfmphqnf.supabase.co"
+  # Timezone — matches the Dockerfile ENV TZ default.
+  TZ: "UK/London"
+  # Application name used for platformdirs log/data path resolution.
+  APPNAME: ""
+  APPAUTHOR: ""
+  # Discord channel ID for name-change notifications.
+  NAMECHANGE_CHANNEL: "1224641680330985492"
+  # Name-change check interval in minutes. Read at import time via @tasks.loop(minutes=...).
+  # CAUTION: must be an integer string (e.g. "15"). A non-numeric value crashes the loop
+  # decorator at import. Leave empty to rely on the code default (15).
+  NAMECHANGE_INTERVAL: ""
+  # Feature flag for automatic dice rolls on submission approval.
+  # Also written back to .env at runtime — changes are ephemeral in Kubernetes (lost on restart).
+  # Leave empty to rely on the code default ("False").
+  AUTO_DICE_ENABLED: ""
+  # Number of sides for the auto-dice feature.
+  # Also written back to .env at runtime (ephemeral). Leave empty for code default (6).
+  AUTO_DICE_SIDES: ""
+  # VERSION is NOT set here — the app self-populates it from the VERSION file at startup.
+
+# Sensitive values — mounted as a Kubernetes Secret via envFrom.
+# Use existingSecret to reference a pre-created Secret (e.g. sealed-secrets) instead.
+secrets:
+  # Name of a pre-existing Secret to use in place of the chart-managed one.
+  # When set, the chart will NOT create a Secret object; all keys below are ignored.
+  existingSecret: ""
+  # Discord bot token (required — app raises ValueError on startup without it).
+  TOKEN: ""
+  # Supabase service key (required — app raises Exception on startup without it).
+  SUPABASE_KEY: ""
+
+# Credentials file mount — for Google service account and bot data/config.json.
+# The chart renders a Kubernetes Secret named by secretName containing these files,
+# mounted read-only into the container at:
+#   /usr/src/bot/data/credentials/service_account.json  (Google service account)
+#   /usr/src/bot/data/config.json                       (spreadsheet key, channel IDs, etc.)
+#
+# Set serviceAccountJson and configJson to the raw file contents to let the chart
+# create the Secret automatically. Leave both empty to use an externally-managed
+# Secret of the same name (e.g. created via sealed-secrets or another operator).
+credentials:
+  secretName: "cvc-credentials"
+  serviceAccountJson: ""
+  configJson: ""
+
+# Volume and volumeMounts are pre-configured to mount the credentials Secret.
+# The secretName here must match credentials.secretName above.
+# Override the full blocks only if you change the secret name or mount paths.
+volumes:
+  - name: credentials
+    secret:
+      secretName: cvc-credentials
+
+volumeMounts:
+  - name: credentials
+    mountPath: /usr/src/bot/data/credentials/service_account.json
+    subPath: service_account.json
+    readOnly: true
+  - name: credentials
+    mountPath: /usr/src/bot/data/config.json
+    subPath: config.json
+    readOnly: true

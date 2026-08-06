@@ -1,0 +1,8 @@
+Clan Europe Legacy Discord Bot Stack deployed.
+{{- if .Values.cvc.enabled }}
+
+CVC Python Discord Bot:
+  Portless worker — connects outbound to Discord's gateway. No HTTP service.
+  Monitor via logs:
+    kubectl logs -l app.kubernetes.io/name=cvc -n {{ .Release.Namespace }} -f
+{{- end }}

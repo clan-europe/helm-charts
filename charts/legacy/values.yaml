@@ -1,0 +1,35 @@
+# Umbrella chart — enable/disable each component independently.
+#
+# To use a pre-existing Secret instead of chart-managed secrets, set
+# cvc.secrets.existingSecret to the Secret name. The chart will then mount
+# that Secret via envFrom and skip creating its own Secret object.
+# The external Secret must contain the keys: TOKEN, SUPABASE_KEY.
+
+cvc:
+  enabled: true
+  secrets:
+    # Name of a pre-existing Secret to use instead of a chart-managed one.
+    # When set, all other secrets.* keys below are ignored.
+    existingSecret: ""
+    TOKEN: ""
+    SUPABASE_KEY: ""
+  credentials:
+    # Name of the Secret holding data/ file mounts (service_account.json, config.json).
+    secretName: "cvc-credentials"
+    # Set to raw JSON content to let the chart create the Secret automatically.
+    # Leave both empty to use an externally-managed Secret named above.
+    serviceAccountJson: ""
+    configJson: ""
+
+# -----------------------------------------------------------------------------
+# Per-component config overrides.
+# Merged into the sub-chart's values. Only set what differs from defaults.
+# -----------------------------------------------------------------------------
+
+# cvc:
+#   config:
+#     GUILD_ID: "840902934392733727"
+#     OWNER_ID: "261816179595673601"
+#     NAMECHANGE_CHANNEL: "1224641680330985492"
+#     SUPABASE_URL: "https://scjaxtezzzbdrfmphqnf.supabase.co"
+#     TZ: "UK/London"

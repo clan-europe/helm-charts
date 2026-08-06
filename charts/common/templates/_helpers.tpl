@@ -54,14 +54,19 @@ Secret name: use existingSecret when supplied, else the chart-managed secret.
 
 {{/*
 Returns true (non-empty) when the chart should mount secrets via envFrom.
-True when either existingSecret is set OR any secrets key is non-empty.
+True when either existingSecret is set OR any other secrets key is non-empty.
+Iterates over arbitrary keys so charts are not limited to a fixed secret keyset.
 */}}
 {{- define "common.hasSecrets" -}}
 {{- $s := .Values.secrets | default dict -}}
 {{- if $s.existingSecret -}}
 true
-{{- else if or $s.DISCORD_TOKEN $s.POCKETBASE_PASSWORD $s.R2_ACCESS_KEY_ID $s.R2_ACCESS_KEY_SECRET -}}
-true
+{{- else -}}
+{{- $found := "" -}}
+{{- range $k, $v := omit $s "existingSecret" -}}
+{{- if $v -}}{{- $found = "true" -}}{{- end -}}
+{{- end -}}
+{{- $found -}}
 {{- end -}}
 {{- end }}
 

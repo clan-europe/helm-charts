@@ -34,11 +34,12 @@ jobs:
           set -euo pipefail
           helm dependency update charts/common
 
-          for chart in bot event pocketbase; do
+          for chart in bot event pocketbase cvc; do
             helm dependency update "charts/$chart"
           done
 
           helm dependency update charts/go-bots
+          helm dependency update charts/legacy
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0

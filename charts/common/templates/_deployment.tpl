@@ -37,22 +37,26 @@ spec:
           {{- with .Values.command }}
           command: {{ toJson . }}
           {{- end }}
+          {{- with .Values.service }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.containerPort | default 3000 }}
+              containerPort: {{ .containerPort | default 3000 }}
               protocol: TCP
+          {{- end }}
+          {{- with .Values.probes }}
           livenessProbe:
             httpGet:
-              path: {{ (.Values.probes).path | default "/api/" }}
+              path: {{ .path | default "/api/" }}
               port: http
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
-              path: {{ (.Values.probes).path | default "/api/" }}
+              path: {{ .path | default "/api/" }}
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
+          {{- end }}
           {{- if or (include "common.hasConfig" .) (include "common.hasSecrets" .) }}
           envFrom:
             {{- if include "common.hasConfig" . }}
@@ -66,6 +70,10 @@ spec:
           {{- end }}
           {{- with .Values.extraEnv }}
           env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.resources }}
@@ -82,6 +90,10 @@ spec:
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 {{- end }}

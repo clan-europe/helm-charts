@@ -1,0 +1,11 @@
+apiVersion: v2
+name: legacy
+description: Umbrella chart deploying the Clan Europe legacy Python Discord bot stack
+type: application
+version: 0.1.7
+appVersion: "main"
+dependencies:
+  - name: cvc
+    version: "0.1.7"
+    repository: "file://../cvc"
+    condition: cvc.enabled

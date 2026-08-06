@@ -10,17 +10,10 @@ metadata:
     {{- include "common.labels" . | nindent 4 }}
 type: Opaque
 stringData:
-  {{- with $s.DISCORD_TOKEN }}
-  DISCORD_TOKEN: {{ . | quote }}
+  {{- range $k, $v := omit $s "existingSecret" }}
+  {{- with $v }}
+  {{ $k }}: {{ . | quote }}
   {{- end }}
-  {{- with $s.POCKETBASE_PASSWORD }}
-  POCKETBASE_PASSWORD: {{ . | quote }}
-  {{- end }}
-  {{- with $s.R2_ACCESS_KEY_ID }}
-  R2_ACCESS_KEY_ID: {{ . | quote }}
-  {{- end }}
-  {{- with $s.R2_ACCESS_KEY_SECRET }}
-  R2_ACCESS_KEY_SECRET: {{ . | quote }}
   {{- end }}
 {{- end }}
 {{- end }}
