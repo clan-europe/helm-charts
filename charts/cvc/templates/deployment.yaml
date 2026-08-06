@@ -1,1 +1,8 @@
-{{- include "common.deployment" . }}
+{{- $secretName := include "cvc.credentialsSecretName" . -}}
+{{- $volumes := list (dict "name" "credentials" "secret" (dict "secretName" $secretName)) -}}
+{{- $volumeMounts := list
+    (dict "name" "credentials" "mountPath" "/usr/src/bot/data/credentials/service_account.json" "subPath" "service_account.json" "readOnly" true)
+    (dict "name" "credentials" "mountPath" "/usr/src/bot/data/config.json" "subPath" "config.json" "readOnly" true) -}}
+{{- $_ := set .Values "volumes" $volumes -}}
+{{- $_ := set .Values "volumeMounts" $volumeMounts -}}
+{{- include "common.deployment" . -}}

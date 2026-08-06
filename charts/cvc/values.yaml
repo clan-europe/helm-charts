@@ -70,33 +70,24 @@ secrets:
   SUPABASE_KEY: ""
 
 # Credentials file mount — for Google service account and bot data/config.json.
-# The chart renders a Kubernetes Secret named by secretName containing these files,
-# mounted read-only into the container at:
+# The chart mounts a Secret read-only into the container at:
 #   /usr/src/bot/data/credentials/service_account.json  (Google service account)
 #   /usr/src/bot/data/config.json                       (spreadsheet key, channel IDs, etc.)
 #
-# Set serviceAccountJson and configJson to the raw file contents to let the chart
-# create the Secret automatically. Leave both empty to use an externally-managed
-# Secret of the same name (e.g. created via sealed-secrets or another operator).
+# Three usage modes:
+#   1. Chart-managed Secret: set serviceAccountJson + configJson; the chart creates the Secret.
+#   2. External Secret (same name): leave serviceAccountJson + configJson empty; the chart
+#      skips Secret creation but still mounts secretName.
+#   3. External Secret (different name): set existingSecret to the Secret name; the chart
+#      skips Secret creation and mounts that Secret instead.
 credentials:
+  # When set, this Secret is mounted instead of the chart-managed one.
+  # The chart will NOT create a credentials Secret; secretName, serviceAccountJson,
+  # and configJson are all ignored.
+  existingSecret: ""
+  # Name used when the chart creates (or mounts an unnamed external) credentials Secret.
   secretName: "cvc-credentials"
+  # Raw JSON content of the Google service account credentials file.
   serviceAccountJson: ""
+  # Raw JSON content of data/config.json (spreadsheet key, channel IDs, etc.).
   configJson: ""
-
-# Volume and volumeMounts are pre-configured to mount the credentials Secret.
-# The secretName here must match credentials.secretName above.
-# Override the full blocks only if you change the secret name or mount paths.
-volumes:
-  - name: credentials
-    secret:
-      secretName: cvc-credentials
-
-volumeMounts:
-  - name: credentials
-    mountPath: /usr/src/bot/data/credentials/service_account.json
-    subPath: service_account.json
-    readOnly: true
-  - name: credentials
-    mountPath: /usr/src/bot/data/config.json
-    subPath: config.json
-    readOnly: true

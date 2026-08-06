@@ -2,9 +2,9 @@ apiVersion: v2
 name: cvc
 description: Helm chart for the Clan Europe CVC legacy Python Discord bot
 type: application
-version: 0.1.7
+version: 0.1.8
 appVersion: "latest"
 dependencies:
   - name: common
-    version: "0.1.7"
+    version: "0.1.8"
     repository: "file://../common"

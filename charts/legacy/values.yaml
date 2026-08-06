@@ -14,6 +14,9 @@ cvc:
     TOKEN: ""
     SUPABASE_KEY: ""
   credentials:
+    # When set, this pre-existing Secret is mounted instead of any chart-managed one.
+    # secretName, serviceAccountJson, and configJson are all ignored when this is set.
+    existingSecret: ""
     # Name of the Secret holding data/ file mounts (service_account.json, config.json).
     secretName: "cvc-credentials"
     # Set to raw JSON content to let the chart create the Secret automatically.
