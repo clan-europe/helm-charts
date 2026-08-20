@@ -1,0 +1,89 @@
+name: Bump Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      appVersion:
+        description: "App version (semver, e.g. 1.2.3)"
+        required: true
+        type: string
+      bumpChartVersion:
+        description: "Bump chart version by 1 patch version"
+        required: true
+        type: boolean
+        default: false
+      charts:
+        description: "Comma-separated chart names (e.g. bot,event,cvc)"
+        required: true
+        type: string
+  repository_dispatch:
+    types: [bump-version]
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Bump versions
+        run: |
+          set -euo pipefail
+
+          APP_VERSION="${{ github.event.inputs.appVersion || github.event.client_payload.appVersion }}"
+          BUMP_CHART="${{ github.event.inputs.bumpChartVersion || github.event.client_payload.bumpChartVersion }}"
+          CHARTS="${{ github.event.inputs.charts || github.event.client_payload.charts }}"
+
+          IFS=',' read -ra CHART_LIST <<< "$CHARTS"
+
+          for chart in "${CHART_LIST[@]}"; do
+            chart="$(echo "$chart" | xargs)"  # trim whitespace
+            CHART_FILE="charts/$chart/Chart.yaml"
+
+            if [[ ! -f "$CHART_FILE" ]]; then
+              echo "ERROR: $CHART_FILE not found" >&2
+              exit 1
+            fi
+
+            echo "Updating $CHART_FILE"
+
+            # Update appVersion
+            sed -i "s/^appVersion:.*$/appVersion: \"$APP_VERSION\"/" "$CHART_FILE"
+
+            if [[ "$BUMP_CHART" == "true" ]]; then
+              # Read current version and bump minor
+              CURRENT_VERSION=$(grep '^version:' "$CHART_FILE" | sed 's/version: *//')
+              MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+              MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+              PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
+              NEW_PATCH=$((PATCH + 1))
+              NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+              sed -i "s/^version:.*$/version: $NEW_VERSION/" "$CHART_FILE"
+              echo "  chart version: $CURRENT_VERSION → $NEW_VERSION"
+            fi
+
+            echo "  appVersion → $APP_VERSION"
+          done
+
+      - name: Commit and push
+        run: |
+          git add charts/*/Chart.yaml
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          CHART_LIST="${{ github.event.inputs.charts || github.event.client_payload.charts }}"
+          APP_VERSION="${{ github.event.inputs.appVersion || github.event.client_payload.appVersion }}"
+          git commit -m "chore: bump appVersion to $APP_VERSION for $CHART_LIST"
+          git push origin main
