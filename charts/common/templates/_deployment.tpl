@@ -78,10 +78,12 @@ spec:
                 name: {{ include "common.secretName" . }}
             {{- end }}
           {{- end }}
-          {{- with .Values.extraEnv }}
           env:
+            - name: VERSION
+              value: "{{ .Values.image.tag | default .Chart.AppVersion }}"
+            {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
