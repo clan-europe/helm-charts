@@ -45,6 +45,12 @@ affinity: {}
 
 extraEnv: []
 
+waitForPocketbase:
+  enabled: true
+  # Health-check URL. Defaults to config.POCKETBASE_URL + /api/health when empty.
+  url: ""
+  image: "busybox:latest"
+
 # Non-sensitive configuration — mounted as a ConfigMap.
 # All values must be strings (Helm quotes them).
 config:

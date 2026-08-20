@@ -30,6 +30,16 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "common.serviceAccountName" . }}
+      {{- if and .Values.waitForPocketbase .Values.waitForPocketbase.enabled }}
+      {{- $pbHealthUrl := .Values.waitForPocketbase.url | default (printf "%s/api/health" (.Values.config.POCKETBASE_URL | default "")) }}
+      initContainers:
+        - name: wait-for-pocketbase
+          image: {{ .Values.waitForPocketbase.image | default "busybox:latest" }}
+          command:
+            - sh
+            - -c
+            - "until wget -q --spider {{ $pbHealthUrl }}; do echo 'waiting for pocketbase'; sleep 2; done"
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
