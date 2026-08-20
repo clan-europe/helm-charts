@@ -40,7 +40,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          APP_VERSION="${{ github.event.inputs.appVersion || github.event.client_payload.appVersion }}"
+          APP_VERSION="v${{ github.event.inputs.appVersion || github.event.client_payload.appVersion }}"
           BUMP_CHART="${{ github.event.inputs.bumpChartVersion || github.event.client_payload.bumpChartVersion }}"
           CHARTS="${{ github.event.inputs.charts || github.event.client_payload.charts }}"
 
