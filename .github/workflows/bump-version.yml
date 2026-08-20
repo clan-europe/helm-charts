@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,6 +46,9 @@ jobs:
 
           IFS=',' read -ra CHART_LIST <<< "$CHARTS"
 
+          declare -A NEW_VERSIONS
+
+          # Pass 1: bump appVersion and (optionally) chart version for each chart
           for chart in "${CHART_LIST[@]}"; do
             chart="$(echo "$chart" | xargs)"  # trim whitespace
             CHART_FILE="charts/$chart/Chart.yaml"
@@ -60,7 +64,7 @@ jobs:
             sed -i "s/^appVersion:.*$/appVersion: \"$APP_VERSION\"/" "$CHART_FILE"
 
             if [[ "$BUMP_CHART" == "true" ]]; then
-              # Read current version and bump minor
+              # Read current version and bump patch
               CURRENT_VERSION=$(grep '^version:' "$CHART_FILE" | sed 's/version: *//')
               MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
               MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
@@ -69,10 +73,36 @@ jobs:
               NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
               sed -i "s/^version:.*$/version: $NEW_VERSION/" "$CHART_FILE"
               echo "  chart version: $CURRENT_VERSION → $NEW_VERSION"
+              NEW_VERSIONS["$chart"]="$NEW_VERSION"
             fi
 
             echo "  appVersion → $APP_VERSION"
           done
+
+          # Pass 2: sync dependency version pins for any in-array chart that
+          # depends on another in-array chart whose version was just bumped
+          if [[ "$BUMP_CHART" == "true" ]]; then
+            update_dep_version() {
+              local file="$1" dep="$2" ver="$3"
+              awk -v dep="$dep" -v ver="$ver" '
+                $1=="-" && $2=="name:" && $3==dep { found=1 }
+                found && $1=="version:" { sub(/version:.*/, "version: \"" ver "\""); found=0 }
+                { print }
+              ' "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+            }
+
+            for chart in "${CHART_LIST[@]}"; do
+              chart="$(echo "$chart" | xargs)"
+              CHART_FILE="charts/$chart/Chart.yaml"
+              for dep in "${!NEW_VERSIONS[@]}"; do
+                [[ "$dep" == "$chart" ]] && continue
+                if grep -qE "^\s*- name:\s*$dep\s*$" "$CHART_FILE"; then
+                  update_dep_version "$CHART_FILE" "$dep" "${NEW_VERSIONS[$dep]}"
+                  echo "  dep $dep → ${NEW_VERSIONS[$dep]} in $chart"
+                fi
+              done
+            done
+          fi
 
       - name: Commit and push
         run: |
@@ -87,3 +117,9 @@ jobs:
           APP_VERSION="${{ github.event.inputs.appVersion || github.event.client_payload.appVersion }}"
           git commit -m "chore: bump appVersion to $APP_VERSION for $CHART_LIST"
           git push origin main
+
+      - name: Trigger chart release
+        if: ${{ (github.event.inputs.bumpChartVersion || github.event.client_payload.bumpChartVersion) == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run charts.yml --ref main
