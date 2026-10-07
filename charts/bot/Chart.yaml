@@ -2,8 +2,8 @@ apiVersion: v2
 name: bot
 description: Helm chart for the Clan Europe main Discord bot
 type: application
-version: 0.1.20
-appVersion: "v0.10.0"
+version: 0.1.21
+appVersion: "v0.11.0"
 dependencies:
   - name: common
     version: "0.1.10"
