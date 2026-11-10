@@ -2,6 +2,20 @@ apiVersion: v1
 entries:
   bot:
   - apiVersion: v2
+    appVersion: v0.13.2
+    created: "2026-11-10T09:17:52.903649317Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 0.1.10
+    description: Helm chart for the Clan Europe main Discord bot
+    digest: e424fa80754f8fe16c59d24ff8c1a1ba2a08c99b8416c9d97fb4e9eaf3c807c3
+    name: bot
+    type: application
+    urls:
+    - https://github.com/clan-europe/helm-charts/releases/download/bot-0.1.25/bot-0.1.25.tgz
+    version: 0.1.25
+  - apiVersion: v2
     appVersion: v0.13.1
     created: "2026-10-23T10:46:28.920551824Z"
     dependencies:
@@ -427,6 +441,20 @@ entries:
     version: 0.1.7
   event:
   - apiVersion: v2
+    appVersion: v0.13.2
+    created: "2026-11-10T09:17:53.119136874Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 0.1.10
+    description: Helm chart for the Clan Europe event management Discord bot
+    digest: bc4bd108c508a3c925844184d668407bdbcfbfb7c3ee9418d4076f6be4ee5946
+    name: event
+    type: application
+    urls:
+    - https://github.com/clan-europe/helm-charts/releases/download/event-0.1.25/event-0.1.25.tgz
+    version: 0.1.25
+  - apiVersion: v2
     appVersion: v0.13.1
     created: "2026-10-23T10:46:29.126085863Z"
     dependencies:
@@ -721,6 +749,30 @@ entries:
     - https://github.com/clan-europe/helm-charts/releases/download/event-0.1.4/event-0.1.4.tgz
     version: 0.1.4
   go-bots:
+  - apiVersion: v2
+    appVersion: v0.13.2
+    created: "2026-11-10T09:17:53.283826125Z"
+    dependencies:
+    - condition: bot.enabled
+      name: bot
+      repository: file://../bot
+      version: 0.1.25
+    - condition: event.enabled
+      name: event
+      repository: file://../event
+      version: 0.1.25
+    - condition: pocketbase.enabled
+      name: pocketbase
+      repository: file://../pocketbase
+      version: 0.1.25
+    description: Umbrella chart deploying the full Clan Europe Golang Discord stack
+      (bot + event + pocketbase)
+    digest: ba9f574ed62d13c059b74aac0112ca5613a24f823e5ebc3c2ba0eab27a694444
+    name: go-bots
+    type: application
+    urls:
+    - https://github.com/clan-europe/helm-charts/releases/download/go-bots-0.1.25/go-bots-0.1.25.tgz
+    version: 0.1.25
   - apiVersion: v2
     appVersion: v0.13.1
     created: "2026-10-23T10:46:29.351498102Z"
@@ -1292,6 +1344,20 @@ entries:
     version: 0.1.7
   pocketbase:
   - apiVersion: v2
+    appVersion: v0.13.2
+    created: "2026-11-10T09:17:53.461374543Z"
+    dependencies:
+    - name: common
+      repository: file://../common
+      version: 0.1.10
+    description: Helm chart for the Clan Europe PocketBase backend
+    digest: b827272bf21b610248546539dcf5be43f55d5898b2e583396dfad40e606ba00b
+    name: pocketbase
+    type: application
+    urls:
+    - https://github.com/clan-europe/helm-charts/releases/download/pocketbase-0.1.25/pocketbase-0.1.25.tgz
+    version: 0.1.25
+  - apiVersion: v2
     appVersion: v0.13.1
     created: "2026-10-23T10:46:29.537111265Z"
     dependencies:
@@ -1585,4 +1651,4 @@ entries:
     urls:
     - https://github.com/clan-europe/helm-charts/releases/download/pocketbase-0.1.4/pocketbase-0.1.4.tgz
     version: 0.1.4
-generated: "2026-10-23T10:46:29.538150873Z"
+generated: "2026-11-10T09:17:53.461975177Z"
