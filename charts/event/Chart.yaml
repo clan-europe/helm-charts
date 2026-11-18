@@ -2,8 +2,8 @@ apiVersion: v2
 name: event
 description: Helm chart for the Clan Europe event management Discord bot
 type: application
-version: 0.1.30
-appVersion: "v0.17.0"
+version: 0.1.31
+appVersion: "v0.18.0"
 dependencies:
   - name: common
     version: "0.1.10"
